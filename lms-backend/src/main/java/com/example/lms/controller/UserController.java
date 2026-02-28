@@ -1,39 +1,38 @@
 package com.example.lms.controller;
 
 import com.example.lms.entity.User;
-import com.example.lms.exception.ResourceNotFoundException;
-import com.example.lms.repository.UserRepository;
-import org.springframework.http.ResponseEntity;
+import com.example.lms.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
 
-    private final UserRepository userRepository;
+    private final UserService service;
 
-    // Constructor Injection
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserController(UserService service) {
+        this.service = service;
     }
 
     @PostMapping
-    public ResponseEntity<User> registerUser(@RequestBody User user) {
-        User savedUser = userRepository.save(user);
-        return ResponseEntity.ok(savedUser);
+    public User register(@RequestBody User user) {
+        return service.createUser(user);
     }
 
+    @PostMapping("/login")
+    public User login(@RequestBody User user) {
+        return service.login(
+                user.getUsername(),
+                user.getPassword(),
+                user.getRole()
+        );
+    }
+    
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userRepository.findAll());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        return ResponseEntity.ok(user);
+    public List<User> getAll() {
+        return service.getAll();
     }
 }

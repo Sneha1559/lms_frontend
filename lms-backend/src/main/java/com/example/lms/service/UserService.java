@@ -2,9 +2,10 @@ package com.example.lms.service;
 
 import org.springframework.stereotype.Service;
 import java.util.List;
-import com.example.lms.repository.UserRepository;
+
+import com.example.lms.entity.Role;
 import com.example.lms.entity.User;
-import com.example.lms.exception.ResourceNotFoundException;
+import com.example.lms.repository.UserRepository;
 
 @Service
 public class UserService {
@@ -19,25 +20,16 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public List<User> getAllUsers() {
+    public User login(String username, String password, Role role) {
+
+        return userRepository.findByUsername(username)
+                .filter(u -> u.getPassword().equals(password))
+                .filter(u -> u.getRole() == role)
+                .orElseThrow(() ->
+                        new RuntimeException("Invalid credentials"));
+    }
+
+    public List<User> getAll() {
         return userRepository.findAll();
-    }
-
-    public User getUserById(Long id) {
-        return userRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + id));
-    }
-
-    public User updateUser(Long id, User updatedUser) {
-        User user = getUserById(id);
-        user.setUsername(updatedUser.getUsername());
-        user.setEmail(updatedUser.getEmail());
-        user.setRole(updatedUser.getRole());
-        return userRepository.save(user);
-    }
-
-    public void deleteUser(Long id) {
-        User user = getUserById(id);
-        userRepository.delete(user);
     }
 }

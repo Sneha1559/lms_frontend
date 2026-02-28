@@ -2,7 +2,6 @@ package com.example.lms.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.util.*;
 
 @Entity
 @Getter
@@ -15,11 +14,14 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
-
-    private String description;
+    private String name;   
+    private String code;
+    private String section;
+    
+	private String room;
 
     @ManyToOne
+    @JoinColumn(name = "faculty_id")
     private User faculty;
 
 	public Long getId() {
@@ -30,20 +32,36 @@ public class Course {
 		this.id = id;
 	}
 
-	public String getTitle() {
-		return title;
+	public String getName() {
+		return name;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String getDescription() {
-		return description;
+	public String getCode() {
+		return code;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public String getSection() {
+		return section;
+	}
+
+	public void setSection(String section) {
+		this.section = section;
+	}
+
+	public String getRoom() {
+		return room;
+	}
+
+	public void setRoom(String room) {
+		this.room = room;
 	}
 
 	public User getFaculty() {
@@ -53,4 +71,5 @@ public class Course {
 	public void setFaculty(User faculty) {
 		this.faculty = faculty;
 	}
+    
 }

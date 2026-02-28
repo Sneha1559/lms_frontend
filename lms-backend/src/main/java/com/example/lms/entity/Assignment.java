@@ -25,7 +25,8 @@ public class Assignment {
     private LocalDate expiryDate;
 
     @ManyToOne
-    private Course course;
+    @JoinColumn(name = "classroom_id")
+    private Course classroom;
 
 	public Long getId() {
 		return id;
@@ -67,11 +68,13 @@ public class Assignment {
 		this.expiryDate = expiryDate;
 	}
 
-	public Course getCourse() {
-		return course;
+	public Course getClassroom() {
+		return classroom;
 	}
 
-	public void setCourse(Course course) {
-		this.course = course;
+	public void setClassroom(Course classroom) {
+		this.classroom = classroom;
 	}
+
+	
 }

@@ -8,43 +8,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
 @RestController
 @RequestMapping("/api/submissions")
+@CrossOrigin
 public class SubmissionController {
 
-    private final SubmissionRepository submissionRepository;
-    private final AssignmentRepository assignmentRepository;
-    private final UserRepository userRepository;
+    private final SubmissionRepository repo;
 
-    public SubmissionController(SubmissionRepository submissionRepository,
-                                AssignmentRepository assignmentRepository,
-                                UserRepository userRepository) {
-        this.submissionRepository = submissionRepository;
-        this.assignmentRepository = assignmentRepository;
-        this.userRepository = userRepository;
+    public SubmissionController(SubmissionRepository repo) {
+        this.repo = repo;
     }
 
-    @PostMapping("/{assignmentId}/student/{studentId}")
-    public ResponseEntity<Submission> submitAssignment(@PathVariable Long assignmentId,
-                                                       @PathVariable Long studentId,
-                                                       @RequestBody Submission submission) {
-
-        Assignment assignment = assignmentRepository.findById(assignmentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Assignment not found"));
-
-        User student = userRepository.findById(studentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
-
-        submission.setAssignment(assignment);
-        submission.setStudent(student);
-        submission.setSubmittedAt(LocalDateTime.now());
-
-        return ResponseEntity.ok(submissionRepository.save(submission));
-    }
-
-    @GetMapping("/assignment/{assignmentId}")
-    public ResponseEntity<List<Submission>> getSubmissions(@PathVariable Long assignmentId) {
-        return ResponseEntity.ok(submissionRepository.findByAssignmentId(assignmentId));
+    @PostMapping
+    public Submission submit(@RequestBody Submission submission) {
+        return repo.save(submission);
     }
 }

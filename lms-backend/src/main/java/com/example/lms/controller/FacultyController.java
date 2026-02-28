@@ -1,17 +1,22 @@
 package com.example.lms.controller;
 
 import org.springframework.web.bind.annotation.*;
-import lombok.RequiredArgsConstructor;
 import java.util.List;
-import com.example.lms.entity.*;
-import com.example.lms.service.*;
+
+import com.example.lms.entity.Course;
+import com.example.lms.service.CourseService;
 
 @RestController
 @RequestMapping("/api/faculty")
-@RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:5173")
 public class FacultyController {
 
-    private final CourseService courseService = new CourseService();
+    private final CourseService courseService;
+
+    // 🔥 MANUAL CONSTRUCTOR
+    public FacultyController(CourseService courseService) {
+        this.courseService = courseService;
+    }
 
     @PostMapping("/{facultyId}/courses")
     public Course createCourse(@PathVariable Long facultyId,

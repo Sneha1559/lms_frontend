@@ -1,41 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SidebarFaculty from "../components/SidebarFaculty";
+import api from "../services/api";
 
 function FacultyDashboard() {
   const [view, setView] = useState("classrooms");
-  const [classrooms, setClassrooms] = useState([
-    { id: 1, name: "Web Development 101", code: "WEB101", section: "A", room: "101", students: 35 },
-    { id: 2, name: "Data Structures", code: "DS102", section: "B", room: "102", students: 28 }
-  ]);
+  const [classrooms, setClassrooms] = useState([]);
   const [selectedClassroom, setSelectedClassroom] = useState(null);
   const [activeTab, setActiveTab] = useState("stream");
-  const [newClassroom, setNewClassroom] = useState({ name: "", code: "", section: "", room: "" });
-  const [posts, setPosts] = useState([
-    { id: 1, type: "announcement", title: "Welcome to Class", content: "Welcome everyone!", date: "Feb 23, 2024", author: "Faculty" }
-  ]);
-  const [newPost, setNewPost] = useState({ title: "", content: "" });
-  const [assignments, setAssignments] = useState([
-    { id: 1, title: "Assignment 1", description: "Complete chapter 1-3", dueDate: "Feb 28", submitted: 12, total: 35 }
-  ]);
-  const [newAssignment, setNewAssignment] = useState({ title: "", description: "", dueDate: "" });
-  const [notes, setNotes] = useState([
-    { id: 1, title: "Introduction to Web Dev", content: "Chapter 1 notes", uploadedDate: "Feb 20", fileName: "Chapter1_Notes.pdf" }
-  ]);
-  const [newNote, setNewNote] = useState({ title: "", content: "", fileName: "" });
+  const [newClassroom, setNewClassroom] = useState({
+    name: "",
+    code: "",
+    section: "",
+    room: ""
+  });
 
-  const handleCreateClassroom = () => {
-    if (newClassroom.name && newClassroom.code) {
-      setClassrooms([...classrooms, {
-        id: classrooms.length + 1,
-        ...newClassroom,
-        students: 0
-      }]);
-      setNewClassroom({ name: "", code: "", section: "", room: "" });
-      alert("Classroom created successfully!");
-    } else {
-      alert("Please fill in classroom name and code");
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  // ✅ LOAD CLASSROOMS FROM BACKEND
+  useEffect(() => {
+    if (user) {
+      api.get(`/api/faculty/${user.id}/courses`)
+        .then(res => setClassrooms(res.data))
+        .catch(err => console.log(err));
     }
-  };
+  }, [user]);
+
+
+   const handleCreateCourse = async () => {
+  if (!newClassroom.name || !newClassroom.code) {
+    alert("Please fill in classroom name and code");
+    return;
+  }
+
+  try {
+    const response = await api.post(
+      `/api/faculty/${user.id}/courses`,
+      newClassroom
+    );
+
+    setClassrooms([...classrooms, response.data]);
+    setNewClassroom({ name: "", code: "", section: "", room: "" });
+
+    alert("Course created successfully!");
+  } catch (error) {
+    console.log(error);
+    alert("Error creating classroom");
+  }
+};
 
   const handlePostAnnouncement = () => {
     if (newPost.title || newPost.content) {
@@ -154,7 +165,9 @@ function FacultyDashboard() {
               value={newClassroom.room}
               onChange={(e) => setNewClassroom({...newClassroom, room: e.target.value})}
             />
-            <button onClick={handleCreateClassroom}>Create Classroom</button>
+            <button onClick={handleCreateCourse}>
+              Create Course
+            </button>
             <button onClick={() => setView("classrooms")}>Cancel</button>
           </div>
         </div>

@@ -6,5 +6,5 @@ import com.example.lms.entity.*;
 import java.util.List;
 
 public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
-    List<Assignment> findByCourseId(Long courseId);
+	List<Notes> findByClassroom_Id(Long classroomId);
 }

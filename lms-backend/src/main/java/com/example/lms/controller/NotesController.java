@@ -9,33 +9,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 @RestController
 @RequestMapping("/api/notes")
+@CrossOrigin
 public class NotesController {
 
-    private final NotesRepository notesRepository;
-    private final CourseRepository courseRepository;
+    private final NotesRepository repo;
 
-    public NotesController(NotesRepository notesRepository,
-                           CourseRepository courseRepository) {
-        this.notesRepository = notesRepository;
-        this.courseRepository = courseRepository;
+    public NotesController(NotesRepository repo) {
+        this.repo = repo;
     }
 
-    @PostMapping("/course/{courseId}")
-    public ResponseEntity<Notes> addNotes(@PathVariable Long courseId,
-                                          @RequestBody Notes notes) {
-
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
-
-        notes.setCourse(course);
-        return ResponseEntity.ok(notesRepository.save(notes));
-    }
-
-    @GetMapping("/course/{courseId}")
-    public ResponseEntity<List<Notes>> getNotes(@PathVariable Long courseId) {
-        return ResponseEntity.ok(notesRepository.findByCourseId(courseId));
+    @GetMapping("/classroom/{classroomId}")
+    public List<Notes> getByClassroom(@PathVariable Long classroomId) {
+        return repo.findByCourse_Id(classroomId);
     }
 }
